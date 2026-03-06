@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.22.0] - 2026-03-06
+
+### Added
+
+- **Formal benchmark results** — skill evaluated using Anthropic's skill-creator framework
+  - 10 parallel subagents, 5 diverse task types, 30 objectively verifiable assertions
+  - with_skill: **96.7% pass rate** (29/30); without_skill: 6.7% (2/30) — delta: +90 percentage points
+  - 3 blind A/B comparisons: with_skill wins 3/3 (100%), avg score 10.0/10 vs 6.8/10
+  - Full methodology in [docs/evals.md](docs/evals.md)
+- **Technical article** — [docs/article.md](docs/article.md): full write-up of the security analysis, fix, and eval methodology
+- **README badges** — Benchmark (96.7% pass rate), A/B Verified (3/3 wins), Security Verified
+- **README Benchmark Results section** — key numbers visible at a glance
+
+### Changed
+
+- `marketplace.json` version corrected to track current release (was stuck at 2.0.0)
+
 ## [2.21.0] - 2026-03-05
 
 ### Security

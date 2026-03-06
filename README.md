@@ -4,6 +4,9 @@
 
 [![Closed Issues](https://img.shields.io/github/issues-closed/OthmanAdi/planning-with-files?color=success)](https://github.com/OthmanAdi/planning-with-files/issues?q=is%3Aissue+is%3Aclosed)
 [![Closed PRs](https://img.shields.io/github/issues-pr-closed/OthmanAdi/planning-with-files?color=success)](https://github.com/OthmanAdi/planning-with-files/pulls?q=is%3Apr+is%3Aclosed)
+[![Benchmark](https://img.shields.io/badge/Benchmark-96.7%25_pass_rate-brightgreen)](docs/evals.md)
+[![A/B Verified](https://img.shields.io/badge/A%2FB_Blind-3%2F3_wins-brightgreen)](docs/evals.md)
+[![Security Verified](https://img.shields.io/badge/Security-Audited_%26_Fixed_v2.21.0-blue)](docs/evals.md)
 
 <details>
 <summary><strong>💬 A Note from the Author</strong></summary>
@@ -230,6 +233,19 @@ Invoke with:
 - `/planning-with-files` - Only if you copied skills to `~/.claude/skills/`
 
 See [docs/quickstart.md](docs/quickstart.md) for the full 5-step guide.
+
+## Benchmark Results
+
+Formally evaluated using Anthropic's [skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) framework (v2.22.0). 10 parallel subagents, 5 task types, 30 objectively verifiable assertions, 3 blind A/B comparisons.
+
+| Test | with_skill | without_skill |
+|------|-----------|---------------|
+| Pass rate (30 assertions) | **96.7%** (29/30) | 6.7% (2/30) |
+| 3-file pattern followed | 5/5 evals | 0/5 evals |
+| Blind A/B wins | **3/3 (100%)** | 0/3 |
+| Avg rubric score | **10.0/10** | 6.8/10 |
+
+[Full methodology and results](docs/evals.md) · [Technical write-up](docs/article.md)
 
 ## Key Rules
 
