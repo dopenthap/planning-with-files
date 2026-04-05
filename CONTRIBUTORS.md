@@ -149,6 +149,10 @@ These amazing people have contributed code, documentation, or significant improv
   - Fixed Codex session-catchup silently scanning Claude session paths; now prints an explicit fallback message when running from Codex context (PR #100)
   - **Impact:** Significant docs and tooling consistency sweep across the entire multi-IDE surface
 
+- **[@Leon-Algo](https://github.com/Leon-Algo)** - [PR #119](https://github.com/OthmanAdi/planning-with-files/pull/119)
+  - Fixed missing executable bits on `.codex/` planning scripts (`check-complete.sh`, `init-session.sh`, `session-catchup.py`)
+  - Added `test_codex_script_permissions.py` regression test to prevent future permission regressions on Codex installs
+
 ## Community Forks
 
 These developers have created forks that extend the functionality:
@@ -192,6 +196,6 @@ If you've contributed and don't see your name here, please open an issue! We wan
 
 ---
 
-**Total Contributors:** 27+ and growing!
+**Total Contributors:** 28+ and growing!
 
-*Last updated: March 24, 2026*
+*Last updated: April 5, 2026*

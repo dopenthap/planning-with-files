@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.30.1] - 2026-04-05
+
+### Fixed
+
+- **Codex scripts not executable** (PR #119 by @Leon-Algo)
+  - `.codex/skills/planning-with-files/scripts/check-complete.sh`, `init-session.sh`, and `session-catchup.py` were tracked as 100644 (not executable), causing `permission denied` on direct invocation
+  - Added `test_codex_script_permissions.py` regression test
+
+### Thanks
+
+- @Leon-Algo for identifying and fixing the Codex script permission issue
+
+---
+
 ## [2.30.0] - 2026-04-03
 
 ### Changed

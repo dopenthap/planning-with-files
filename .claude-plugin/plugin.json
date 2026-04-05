@@ -1,6 +1,6 @@
 {
   "name": "planning-with-files",
-  "version": "2.30.0",
+  "version": "2.30.1",
   "description": "Manus-style persistent markdown files for planning, progress tracking, and knowledge storage. Works with Claude Code, Kiro, Clawd CLI, Gemini CLI, Cursor, Continue, and 11+ AI coding assistants.",
   "author": {
     "name": "OthmanAdi",
