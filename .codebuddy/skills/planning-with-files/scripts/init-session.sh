@@ -1,120 +1,165 @@
 #!/bin/bash
-# Initialize planning files for a new session
-# Usage: ./init-session.sh [project-name]
+# init-session.sh
+# Initializes a planning session by creating the necessary file structure
+# and populating initial plan files based on user input.
 
-set -e
+set -euo pipefail
 
-PROJECT_NAME="${1:-project}"
-DATE=$(date +%Y-%m-%d)
+# ─── Configuration ───────────────────────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILL_DIR="$(dirname "$SCRIPT_DIR")"
+DEFAULT_PLAN_DIR="./plan"
+DATE=$(date +"%Y-%m-%d")
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
-echo "Initializing planning files for: $PROJECT_NAME"
+# ─── Colors ──────────────────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-# Create task_plan.md if it doesn't exist
-if [ ! -f "task_plan.md" ]; then
-    cat > task_plan.md << 'EOF'
-# Task Plan: [Brief Description]
+# ─── Helpers ─────────────────────────────────────────────────────────────────
+log_info()    { echo -e "${BLUE}[INFO]${NC}  $*"; }
+log_success() { echo -e "${GREEN}[OK]${NC}    $*"; }
+log_warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
+log_error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Initialize a new planning-with-files session.
+
+Options:
+  -d, --dir DIR        Directory to create plan files in (default: ./plan)
+  -n, --name NAME      Project/session name
+  -t, --template TPL   Template to use: basic | detailed | sprint (default: basic)
+  -f, --force          Overwrite existing session files
+  -h, --help           Show this help message
+
+Examples:
+  $(basename "$0") --name "my-feature" --dir ./plans
+  $(basename "$0") -n "Q3 Roadmap" -t detailed -d ./roadmap
+EOF
+}
+
+# ─── Argument Parsing ────────────────────────────────────────────────────────
+PLAN_DIR="$DEFAULT_PLAN_DIR"
+SESSION_NAME=""
+TEMPLATE="basic"
+FORCE=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -d|--dir)      PLAN_DIR="$2";      shift 2 ;;
+    -n|--name)     SESSION_NAME="$2";  shift 2 ;;
+    -t|--template) TEMPLATE="$2";      shift 2 ;;
+    -f|--force)    FORCE=true;          shift   ;;
+    -h|--help)     usage; exit 0        ;;
+    *) log_error "Unknown option: $1"; usage; exit 1 ;;
+  esac
+done
+
+# ─── Validation ──────────────────────────────────────────────────────────────
+if [[ -z "$SESSION_NAME" ]]; then
+  log_error "Session name is required. Use -n / --name."
+  usage
+  exit 1
+fi
+
+case "$TEMPLATE" in
+  basic|detailed|sprint) ;;
+  *) log_error "Invalid template '$TEMPLATE'. Choose: basic, detailed, sprint."; exit 1 ;;
+esac
+
+# ─── Directory Setup ─────────────────────────────────────────────────────────
+if [[ -d "$PLAN_DIR" && "$FORCE" == false ]]; then
+  log_warn "Directory '$PLAN_DIR' already exists. Use --force to overwrite."
+  exit 1
+fi
+
+mkdir -p "$PLAN_DIR"
+log_success "Created plan directory: $PLAN_DIR"
+
+# ─── Write Session Metadata ──────────────────────────────────────────────────
+cat > "$PLAN_DIR/session.json" <<EOF
+{
+  "name": "$SESSION_NAME",
+  "template": "$TEMPLATE",
+  "created": "$DATE",
+  "timestamp": "$TIMESTAMP",
+  "status": "in-progress",
+  "tasks": []
+}
+EOF
+log_success "Written session metadata: $PLAN_DIR/session.json"
+
+# ─── Write Plan Files Based on Template ──────────────────────────────────────
+write_basic() {
+  cat > "$PLAN_DIR/plan.md" <<EOF
+# $SESSION_NAME
+_Created: $DATE_
 
 ## Goal
-[One sentence describing the end state]
+<!-- Describe the overall goal of this session -->
 
-## Current Phase
-Phase 1
+## Tasks
+- [ ] Task 1
+- [ ] Task 2
 
-## Phases
-
-### Phase 1: Requirements & Discovery
-- [ ] Understand user intent
-- [ ] Identify constraints
-- [ ] Document in findings.md
-- **Status:** in_progress
-
-### Phase 2: Planning & Structure
-- [ ] Define approach
-- [ ] Create project structure
-- **Status:** pending
-
-### Phase 3: Implementation
-- [ ] Execute the plan
-- [ ] Write to files before executing
-- **Status:** pending
-
-### Phase 4: Testing & Verification
-- [ ] Verify requirements met
-- [ ] Document test results
-- **Status:** pending
-
-### Phase 5: Delivery
-- [ ] Review outputs
-- [ ] Deliver to user
-- **Status:** pending
-
-## Decisions Made
-| Decision | Rationale |
-|----------|-----------|
-
-## Errors Encountered
-| Error | Resolution |
-|-------|------------|
+## Notes
+<!-- Any additional context or blockers -->
 EOF
-    echo "Created task_plan.md"
-else
-    echo "task_plan.md already exists, skipping"
-fi
+}
 
-# Create findings.md if it doesn't exist
-if [ ! -f "findings.md" ]; then
-    cat > findings.md << 'EOF'
-# Findings & Decisions
+write_detailed() {
+  write_basic
+  cat > "$PLAN_DIR/breakdown.md" <<EOF
+# Detailed Breakdown — $SESSION_NAME
+_Created: $DATE_
 
-## Requirements
--
+## Milestones
+| # | Milestone | Owner | Due | Status |
+|---|-----------|-------|-----|--------|
+| 1 | | | | pending |
 
-## Research Findings
--
-
-## Technical Decisions
-| Decision | Rationale |
-|----------|-----------|
-
-## Issues Encountered
-| Issue | Resolution |
-|-------|------------|
-
-## Resources
--
+## Risks
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| | | | |
 EOF
-    echo "Created findings.md"
-else
-    echo "findings.md already exists, skipping"
-fi
+}
 
-# Create progress.md if it doesn't exist
-if [ ! -f "progress.md" ]; then
-    cat > progress.md << EOF
-# Progress Log
+write_sprint() {
+  write_basic
+  cat > "$PLAN_DIR/sprint.md" <<EOF
+# Sprint Plan — $SESSION_NAME
+_Created: $DATE_
 
-## Session: $DATE
+## Sprint Goal
 
-### Current Status
-- **Phase:** 1 - Requirements & Discovery
-- **Started:** $DATE
+## Backlog
+| ID | Story | Points | Assignee | Status |
+|----|-------|--------|----------|--------|
+| 1  |       |        |          | todo   |
 
-### Actions Taken
--
-
-### Test Results
-| Test | Expected | Actual | Status |
-|------|----------|--------|--------|
-
-### Errors
-| Error | Resolution |
-|-------|------------|
+## Definition of Done
+- [ ] Code reviewed
+- [ ] Tests passing
+- [ ] Documentation updated
 EOF
-    echo "Created progress.md"
-else
-    echo "progress.md already exists, skipping"
-fi
+}
 
+case "$TEMPLATE" in
+  basic)    write_basic    ;;
+  detailed) write_detailed ;;
+  sprint)   write_sprint   ;;
+esac
+
+log_success "Written plan files for template: $TEMPLATE"
+
+# ─── Done ────────────────────────────────────────────────────────────────────
 echo ""
-echo "Planning files initialized!"
-echo "Files: task_plan.md, findings.md, progress.md"
+log_success "Session '${SESSION_NAME}' initialized in '${PLAN_DIR}'"
+log_info "Next step: edit ${PLAN_DIR}/plan.md and start adding tasks."
